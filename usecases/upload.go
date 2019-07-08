@@ -8,7 +8,7 @@ import (
 	"net/url"
 )
 
-type Upload struct { // {{{2
+type Upload struct {
 	ContentPathBuilder
 	ContentWriter
 	UploadPresenter
@@ -24,48 +24,29 @@ type UploadOutput struct {
 	url.URL
 }
 
-func (u Upload) Handle(ctx context.Context, input UploadInput) error { // {{{2
+func (u Upload) Handle(ctx context.Context, input UploadInput) error {
 
-	path, err := u.ContentPathBuilder.Build(ctx, BuildContentPathInput{
-		Filename: input.Filename,
-	})
+	path, err := u.ContentPathBuilder.Build(ctx, input.Filename)
 	if err != nil {
 		return errors.Cause(err)
 	}
 
-	writeResult, err := u.ContentWriter.Write(ctx, ContentWriteInput{
-		ContentPath: path,
-		Reader:      input.Reader,
-	})
+	url, err := u.ContentWriter.Write(ctx, input.Reader, path)
 
-	result := UploadOutput{
+	return u.UploadPresenter.Complete(ctx, UploadOutput{
 		Filename: input.Filename,
-		URL:      writeResult.URL,
-	}
-	return u.UploadPresenter.Complete(ctx, result)
+		URL:      url,
+	})
 }
 
-type ContentPathBuilder interface { // {{{2
-	Build(ctx context.Context, input BuildContentPathInput) (entities.ContentPath, error)
+type ContentPathBuilder interface {
+	Build(ctx context.Context, filename entities.Filename) (entities.ContentPath, error)
 }
 
-type BuildContentPathInput struct {
-	entities.Filename
+type ContentWriter interface {
+	Write(ctx context.Context, reader io.Reader, path entities.ContentPath) (url.URL, error)
 }
 
-type ContentWriter interface { // {{{2
-	Write(ctx context.Context, input ContentWriteInput) (ContentWriteOutput, error)
-}
-
-type ContentWriteInput struct {
-	Reader io.Reader
-	entities.ContentPath
-}
-
-type ContentWriteOutput struct {
-	url.URL
-}
-
-type UploadPresenter interface { // {{{2
+type UploadPresenter interface {
 	Complete(ctx context.Context, data UploadOutput) error
 }

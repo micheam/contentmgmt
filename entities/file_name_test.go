@@ -34,19 +34,19 @@ func TestNewFilename(t *testing.T) {
 			wantErr:   false,
 		},
 		{
-			name:      "err must return if file name contains CR",
-			args:      args{raw: "filenamewith\r"},
-			wantErr:   true,
+			name:    "err must return if file name contains CR",
+			args:    args{raw: "filenamewith\r"},
+			wantErr: true,
 		},
 		{
-			name:      "err must return if file name contains LF",
-			args:      args{raw: "filenamewith\n"},
-			wantErr:   true,
+			name:    "err must return if file name contains LF",
+			args:    args{raw: "filenamewith\n"},
+			wantErr: true,
 		},
 		{
-			name:      "err must return if file name is empty",
-			args:      args{raw: ""},
-			wantErr:   true,
+			name:    "err must return if file name is empty",
+			args:    args{raw: ""},
+			wantErr: true,
 		},
 	}
 	for _, tt := range tests {
