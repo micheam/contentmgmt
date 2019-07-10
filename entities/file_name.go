@@ -1,6 +1,7 @@
 package entities
 
 import (
+	"path/filepath"
 	"regexp"
 	"strings"
 )
@@ -18,11 +19,13 @@ func NewFilename(raw string) (fname *Filename, err error) {
 		return fname, IllegalFilename("File name must not be empty")
 	}
 
-	if regxNewline.MatchString(raw) {
+    rawName := filepath.Base(raw)
+
+	if regxNewline.MatchString(rawName) {
 		return fname, IllegalFilename("File name must not contain new-line.")
 	}
 
-	name := strings.TrimSpace(raw)
+	name := strings.TrimSpace(rawName)
 	name = strings.ReplaceAll(name, " ", "_")
 	name = strings.ReplaceAll(name, "#", "_")
 

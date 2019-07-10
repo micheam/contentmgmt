@@ -2,4 +2,8 @@ module github.com/micheam/imgcontent
 
 go 1.12
 
-require github.com/pkg/errors v0.8.1
+require (
+	cloud.google.com/go v0.41.0
+	github.com/pkg/errors v0.8.1
+	github.com/urfave/cli v1.20.0
+)
