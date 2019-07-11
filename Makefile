@@ -1,6 +1,14 @@
 .PHONY: build
-build:
-	go build -o imgcontent
+build: clean
+	mkdir ./bin && go build -o ./bin/imgcontent
+
+.PHONY: clean
+clean:
+	rm -r ./bin/
+
+.PHONY: install
+install:
+	go install
 
 .PHONY: test
 test:

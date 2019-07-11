@@ -7,6 +7,13 @@
 
 ## Usage
 
+アップロード先の指定:
+
+環境変数 | 内容 | 例
+--|--|--
+IMGCONTENT_GCS_CREDENTIALS | Google Cloud Storage Credential file (json) | $HOME/.config/imgcontent/your-bucket-999999999999.json
+IMGCONTENT_GCS_BUCKET | 対象バケット名 | your-bucket
+
 画像ファイルのアップロード:
 
 ```sh

@@ -32,6 +32,9 @@ func (u Upload) Handle(ctx context.Context, input UploadInput) error {
 	}
 
 	url, err := u.ContentWriter.Write(ctx, input.Reader, path)
+    if err != nil {
+        return errors.Wrap(err, "Failed to Write content")
+    }
 
 	return u.UploadPresenter.Complete(ctx, UploadOutput{
 		Filename: input.Filename,
