@@ -18,6 +18,6 @@ func NewApp() *cli.App {
 }
 
 var Commands = []cli.Command{
-	upload,
+	uploadCmd,
 }
 

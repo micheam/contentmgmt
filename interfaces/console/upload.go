@@ -14,7 +14,7 @@ import (
 	"github.com/urfave/cli"
 )
 
-var upload = cli.Command{
+var uploadCmd = cli.Command{
 	Name:      "upload",
 	Usage:     "画像ファイルをアップロードします",
 	ArgsUsage: "<filepath>",

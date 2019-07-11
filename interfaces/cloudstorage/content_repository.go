@@ -34,5 +34,9 @@ func (g GCPContentRepository) Write(ctx context.Context, file io.Reader, path en
 		return
 	}
 
+    url.Scheme = "https"
+    url.Host = "storage.googleapis.com"
+    url.Path = bucketName + "/" + string(path)
+
 	return url, nil
 }
