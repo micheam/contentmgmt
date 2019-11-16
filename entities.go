@@ -1,10 +1,12 @@
-package entities
+package imgcontent
 
 import (
 	"path/filepath"
 	"regexp"
 	"strings"
 )
+
+type ContentPath string
 
 var regxNewline = regexp.MustCompile(`\r\n|\r|\n`) //throw panic if fail
 
@@ -16,13 +18,13 @@ type Filename struct {
 func NewFilename(raw string) (fname *Filename, err error) {
 
 	if raw == "" {
-		return fname, IllegalFilename("File name must not be empty")
+		return fname, ErrIllegalFilename("file name must not be empty")
 	}
 
-    rawName := filepath.Base(raw)
+	rawName := filepath.Base(raw)
 
 	if regxNewline.MatchString(rawName) {
-		return fname, IllegalFilename("File name must not contain new-line.")
+		return fname, ErrIllegalFilename("file name must not contain new-line.")
 	}
 
 	name := strings.TrimSpace(rawName)
@@ -32,8 +34,8 @@ func NewFilename(raw string) (fname *Filename, err error) {
 	return &Filename{Value: name, Valid: true}, err
 }
 
-type IllegalFilename string
+type ErrIllegalFilename string
 
-func (e IllegalFilename) Error() string {
+func (e ErrIllegalFilename) Error() string {
 	return string(e)
 }

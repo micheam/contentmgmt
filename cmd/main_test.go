@@ -1,34 +1,33 @@
-package console
+package main
 
 import (
 	"context"
+	"github.com/micheam/imgcontent"
 	"reflect"
 	"testing"
 	"time"
-
-	en "github.com/micheam/imgcontent/entities"
 )
 
 func TestDefaultContentPathBuilder_Build(t *testing.T) {
 
-	basedate, _ := time.Parse("2006-01-02", "2014-10-27")
+	basetime, _ := time.Parse("2006-01-02 03:04:05", "2014-10-27 11:12:13")
 
 	type args struct {
 		ctx      context.Context
-		filename en.Filename
+		filename imgcontent.Filename
 	}
 	tests := []struct {
 		name     string
-		c        DefaultContentPathBuilder
+		c        ConsoleContentPathBuilder
 		args     args
-		wantPath en.ContentPath
+		wantPath imgcontent.ContentPath
 		wantErr  bool
 	}{
 		{
 			name:     "return path with time prefix and filename",
-			c:        DefaultContentPathBuilder{BaseDate: basedate},
-			args:     args{ctx: context.TODO(), filename: en.Filename{Value: "filename.png", Valid: true}},
-			wantPath: en.ContentPath("2014/10/27/filename.png"),
+			c:        ConsoleContentPathBuilder{BaseTime: &basetime},
+			args:     args{ctx: context.TODO(), filename: imgcontent.Filename{Value: "filename.png", Valid: true}},
+			wantPath: imgcontent.ContentPath("2014/10/27/111213.filename.png"),
 		},
 	}
 	for _, tt := range tests {

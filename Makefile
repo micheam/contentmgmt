@@ -1,10 +1,11 @@
-.PHONY: build
-build: clean
+APPNAME=imgcontent
+
+$(APPNAME): clean
 	mkdir ./bin && go build -o ./bin/imgcontent
 
 .PHONY: clean
 clean:
-	rm -r ./bin/
+	rm -rf ./bin/
 
 .PHONY: install
 install:

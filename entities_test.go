@@ -1,4 +1,4 @@
-package entities
+package imgcontent
 
 import (
 	"reflect"
@@ -58,23 +58,6 @@ func TestNewFilename(t *testing.T) {
 			}
 			if !reflect.DeepEqual(gotFname, tt.wantFname) {
 				t.Errorf("NewFilename() = %v, want %v", gotFname, tt.wantFname)
-			}
-		})
-	}
-}
-
-func TestIllegalFilename_Error(t *testing.T) {
-	tests := []struct {
-		name string
-		e    IllegalFilename
-		want string
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := tt.e.Error(); got != tt.want {
-				t.Errorf("IllegalFilename.Error() = %v, want %v", got, tt.want)
 			}
 		})
 	}
