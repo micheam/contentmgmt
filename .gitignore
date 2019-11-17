@@ -13,7 +13,5 @@
 # Output of the go coverage tool, specifically when used with LiteIDE
 *.out
 
-
-imgcontent
 micheam-tech-blog-1d0ee1580ccb.json
 bin/

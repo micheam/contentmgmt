@@ -1,4 +1,4 @@
-package imgcontent
+package contentmgmt
 
 import (
 	"reflect"

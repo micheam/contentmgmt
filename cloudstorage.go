@@ -1,4 +1,4 @@
-package imgcontent
+package contentmgmt
 
 import (
 	"cloud.google.com/go/storage"

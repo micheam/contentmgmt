@@ -10,7 +10,7 @@ import (
 	"time"
 
 	"cloud.google.com/go/storage"
-	"github.com/micheam/imgcontent"
+	"github.com/micheam/contentmgmt"
 	"github.com/pkg/errors"
 	"github.com/urfave/cli"
 )
@@ -68,7 +68,7 @@ var uploadCmd = cli.Command{
 		}
 
 		bucketName := os.Getenv("IMGCONTENT_GCS_BUCKET")
-		contentWriter := imgcontent.GCPContentRepository{
+		contentWriter := contentmgmt.GCPContentRepository{
 			BucketName: bucketName,
 			Client:     client,
 		}
@@ -79,19 +79,19 @@ var uploadCmd = cli.Command{
 		uploadPresenter := ConsoleUploadResultPresenter{Tmpl: &resultTemplate}
 
 		// init interacter
-		usecase := imgcontent.UploadUsecase{
+		usecase := contentmgmt.UploadUsecase{
 			PathBuilder: contentPathBuilder,
 			Writer:      contentWriter,
 			Presenter:   uploadPresenter,
 		}
 
 		// create InputData
-		filename, err := imgcontent.NewFilename(file.Name())
+		filename, err := contentmgmt.NewFilename(file.Name())
 		if err != nil {
 			log.Fatal(err.Error())
 		}
 
-		request := imgcontent.UploadInput{
+		request := contentmgmt.UploadInput{
 			Filename: *filename,
 			Reader:   file,
 		}
@@ -108,7 +108,7 @@ type ConsoleContentPathBuilder struct {
 const DefaultContentPathTemplate = `{{.BaseTime.Format "2006/01/02/030405"}}.{{.FileName}}`
 
 func (c ConsoleContentPathBuilder) Build(
-	ctx context.Context, fname imgcontent.Filename) (path imgcontent.ContentPath, err error) {
+	ctx context.Context, fname contentmgmt.Filename) (path contentmgmt.ContentPath, err error) {
 
 	basetime := time.Now()
 	if c.BaseTime != nil {
@@ -136,7 +136,7 @@ func (c ConsoleContentPathBuilder) Build(
 		return path, errors.Wrap(err, "failed to build content path")
 	}
 
-	path = imgcontent.ContentPath(buf.String())
+	path = contentmgmt.ContentPath(buf.String())
 	log.Printf("content path: computed %q", path)
 
 	return
@@ -148,7 +148,7 @@ type ConsoleUploadResultPresenter struct {
 
 const DefaultResultTemplate = `{{.Scheme}}://{{.Host}}/{{.Path}}`
 
-func (c ConsoleUploadResultPresenter) Complete(ctx context.Context, data imgcontent.UploadOutput) error {
+func (c ConsoleUploadResultPresenter) Complete(ctx context.Context, data contentmgmt.UploadOutput) error {
 
 	model := struct {
 		Scheme, Host, Path, Alt string
