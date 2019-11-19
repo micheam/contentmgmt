@@ -153,7 +153,7 @@ func (c ConsoleContentPathBuilder) Build(
 
 	basetime := time.Now()
 	if c.BaseTime != nil {
-		basetime = time.Now()
+		basetime = *c.BaseTime
 	}
 
 	model := struct {
