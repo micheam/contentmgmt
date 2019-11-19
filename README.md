@@ -63,6 +63,7 @@ USAGE:
 
 OPTIONS:
    --format value  Display result with specified format. [mkd,html,adoc]
+   --clipboard, -c  Write result to clipboard
 ```
 
 Upload your content to Google-CloudStorage:

@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"cloud.google.com/go/storage"
+	"github.com/atotto/clipboard"
 	"github.com/micheam/contentmgmt"
 	"github.com/pkg/errors"
 	"github.com/urfave/cli"
@@ -54,6 +55,10 @@ var uploadCmd = cli.Command{
 		cli.StringFlag{
 			Name:  "format",
 			Usage: "Display result with specified format. [mkd,html,adoc]",
+		},
+		cli.BoolFlag{
+			Name:  "clipboard,c",
+			Usage: "Write result to clipboard",
 		},
 	},
 	Action: func(c *cli.Context) error {
@@ -106,10 +111,13 @@ var uploadCmd = cli.Command{
 		case "":
 			resultTemplate = DefaultResultTemplate
 		default:
-			return errors.Errorf(`Unknown format %q. You must specify one of 'mkd','html' or 'asd'.
-See: 'imgcontent upload help'`, c.String("format"))
+			return errors.Errorf("Unknown format %q. You must specify one of 'mkd','html' or 'asd'.\n"+
+				"See: 'imgcontent upload help' for detail", c.String("format"))
 		}
-		uploadPresenter := ConsoleUploadResultPresenter{Tmpl: resultTemplate}
+		uploadPresenter := ConsoleUploadResultPresenter{
+			Tmpl:             resultTemplate,
+			WriteToClipboard: c.Bool("clipboard"),
+		}
 
 		// init interacter
 		usecase := contentmgmt.UploadUsecase{
@@ -176,7 +184,8 @@ func (c ConsoleContentPathBuilder) Build(
 }
 
 type ConsoleUploadResultPresenter struct {
-	Tmpl string
+	Tmpl             string
+	WriteToClipboard bool
 }
 
 const (
@@ -187,6 +196,8 @@ const (
 )
 
 func (c ConsoleUploadResultPresenter) Complete(ctx context.Context, data contentmgmt.UploadOutput) error {
+
+	var err error
 
 	model := struct {
 		Scheme, Host, Path, Filename string
@@ -205,7 +216,20 @@ func (c ConsoleUploadResultPresenter) Complete(ctx context.Context, data content
 	log.Printf("result: template %q", tmpl)
 
 	t := template.Must(template.New("result-template").Parse(tmpl))
-	t.Execute(os.Stdout, model)
 
+	var buf bytes.Buffer
+	if err = t.Execute(&buf, model); err != nil {
+		return errors.Wrap(err, "fialed to execute result tempalte")
+	}
+
+	result := buf.String()
+	if c.WriteToClipboard {
+		log.Printf("write result to clipboard")
+		if err = clipboard.WriteAll(result); err != nil {
+			return errors.Wrap(err, "failed to write result to clipboard")
+		}
+	}
+
+	fmt.Fprintf(os.Stdout, result)
 	return nil
 }
