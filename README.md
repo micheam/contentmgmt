@@ -1,21 +1,17 @@
 # imgcontent
 
-画像コンテンツ管理用 CLI ツールです。  
-ブログ記事などに使用する画像ファイルをクラウド環境のストレージに登録・参照する機能を提供します。
+CLI tool for image content management.
+Register image files used for blog posts, etc. in the cloud storage.
 
-初期開発時点では、[Google Cloud Storage]をターゲットとしています。  
+At the time of initial development, [Google Cloud Storage] is targeted.
 
 ## Installation
 
 [Notice] We have not yet distributed prebuilt binaries 😴
 
-clone this repository:
+get src and build binary with `go get`:
 
-    git clone https://github.com/micheam/contentmgmt
-
-go to cmd directory:
-
-    cd ./contentmgmt/cmd/imgcontent && go install
+    go get github.com/micheam/contentmgmt/cmd/imgcontent
 
 `imgcontent` binary will be installed:
 
