@@ -5,12 +5,28 @@
 
 初期開発時点では、[Google Cloud Storage]をターゲットとしています。  
 
+## Installation
+
+[Notice] We have not yet distributed prebuilt binaries 😴
+
+clone this repository:
+
+    git clone https://github.com/micheam/contentmgmt
+
+go to cmd directory:
+
+    cd ./contentmgmt/cmd/imgcontent && go install
+
+`imgcontent` binary will be installed:
+
+    imgcontent help
+
 ## Environment values
 
-環境変数 | 内容 | 例
+env | content | note
 --|--|--
-IMGCONTENT_GCS_CREDENTIALS | Google Cloud Storage Credential file (json) | $HOME/.config/imgcontent/your-bucket-999999999999.json
-IMGCONTENT_GCS_BUCKET | 対象バケット名 | your-bucket
+IMGCONTENT_GCS_CREDENTIALS | Path to Google CloudStorage Credential file (json) | $HOME/.config/imgcontent/your-bucket-999999999999.json
+IMGCONTENT_GCS_BUCKET | bucket name | your-bucket
 
 ## Usage
 
@@ -36,30 +52,36 @@ GLOBAL OPTIONS:
    --version, -v  print the version
 ```
 
-upload your jpeg to gcp:
+## Command: Upload
+
+```
+NAME:
+   imgcontent upload - upload file as a web content
+
+USAGE:
+   imgcontent upload [command options] <filepath>
+
+OPTIONS:
+   --format value  Display result with specified format. [mkd,html,adoc]
+```
+
+Upload your content to Google-CloudStorage:
 
     imgcontent upload ./sample.jpeg
 
-result will print via stdout:
+Result will print via stdout:
 
 ```console
 $ imgcontent upload ./sample.jpeg
-![image.jpg](https://storage.googleapis.com/micheam-image-content/2019/11/17/070934.image.jpg)
+https://storage.googleapis.com/micheam-image-content/2019/11/17/070934.image.jpg
 ```
 
+You can specify result format with `--format`:
 
-## Installation
-clone this repository:
-
-    git clone https://github.com/micheam/contentmgmt
-
-go to cmd directory:
-
-    cd ./contentmgmt/cmd/imgcontent && go install
-
-`imgcontent` binary will be installed:
-
-    imgcontent help
+```console
+$ imgcontent upload --format mkd ./sample.jpeg
+![sample.jpeg](https://storage.googleapis.com/micheam-image-content/2019/11/19/100607.sample.jpeg)
+```
 
 ## Author
 [micheam](https://github.com/micheam) - <michito.maeda@gmail.com>

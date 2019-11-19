@@ -39,8 +39,15 @@ func main() {
 
 var uploadCmd = cli.Command{
 	Name:      "upload",
+	Aliases:   []string{"u"},
 	Usage:     "upload file as a web content",
 	ArgsUsage: "<filepath>",
+	Flags: []cli.Flag{
+		cli.StringFlag{
+			Name:  "format",
+			Usage: "Display result with specified format. [mkd,html,adoc]",
+		},
+	},
 	Action: func(c *cli.Context) error {
 
 		if c.NArg() > 1 {
@@ -74,9 +81,21 @@ var uploadCmd = cli.Command{
 		}
 
 		// init presenter
-		// TODO(michema): spec template from file
-		resultTemplate := `![{{.Alt}}]({{.Scheme}}://{{.Host}}/{{.Path}})`
-		uploadPresenter := ConsoleUploadResultPresenter{Tmpl: &resultTemplate}
+		var resultTemplate string
+		switch c.String("format") {
+		case "mkd":
+			resultTemplate = MarkdownResultTemplate
+		case "html":
+			resultTemplate = HTMLResultTemplate
+		case "asd":
+			resultTemplate = AsciidocResultTemplate
+		case "":
+			resultTemplate = DefaultResultTemplate
+		default:
+			return errors.Errorf(`Unknown format %q. You must specify one of 'mkd','html' or 'asd'.
+See: 'imgcontent upload help'`, c.String("format"))
+		}
+		uploadPresenter := ConsoleUploadResultPresenter{Tmpl: resultTemplate}
 
 		// init interacter
 		usecase := contentmgmt.UploadUsecase{
@@ -143,25 +162,30 @@ func (c ConsoleContentPathBuilder) Build(
 }
 
 type ConsoleUploadResultPresenter struct {
-	Tmpl *string
+	Tmpl string
 }
 
-const DefaultResultTemplate = `{{.Scheme}}://{{.Host}}/{{.Path}}`
+const (
+	DefaultResultTemplate  = `{{.Scheme}}://{{.Host}}/{{.Path}}`
+	MarkdownResultTemplate = `![{{.Filename}}]({{.Scheme}}://{{.Host}}/{{.Path}})`
+	HTMLResultTemplate     = `<img alt="{{.Filename}}" src="{{.Scheme}}://{{.Host}}/{{.Path}}" />`
+	AsciidocResultTemplate = `image::{{.Scheme}}://{{.Host}}/{{.Path}}[{{.Filename}}]`
+)
 
 func (c ConsoleUploadResultPresenter) Complete(ctx context.Context, data contentmgmt.UploadOutput) error {
 
 	model := struct {
-		Scheme, Host, Path, Alt string
+		Scheme, Host, Path, Filename string
 	}{
-		Scheme: data.URL.Scheme,
-		Host:   data.URL.Host,
-		Path:   data.URL.EscapedPath(),
-		Alt:    data.Filename.Value,
+		Scheme:   data.URL.Scheme,
+		Host:     data.URL.Host,
+		Path:     data.URL.EscapedPath(),
+		Filename: data.Filename.Value,
 	}
 
 	tmpl := DefaultResultTemplate
-	if c.Tmpl != nil {
-		tmpl = *c.Tmpl
+	if c.Tmpl != "" {
+		tmpl = c.Tmpl
 	}
 
 	log.Printf("result: template %q", tmpl)
