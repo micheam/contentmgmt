@@ -1,5 +1,7 @@
 # imgcontent
 
+![](https://github.com/micheam/contentmgmt/workflows/Test/badge.svg)
+
 CLI tool for image content management.
 Register image files used for blog posts, etc. in the cloud storage.
 
