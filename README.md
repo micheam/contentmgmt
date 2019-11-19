@@ -5,37 +5,63 @@
 
 初期開発時点では、[Google Cloud Storage]をターゲットとしています。  
 
-## Usage
-
-アップロード先の指定:
+## Environment values
 
 環境変数 | 内容 | 例
 --|--|--
 IMGCONTENT_GCS_CREDENTIALS | Google Cloud Storage Credential file (json) | $HOME/.config/imgcontent/your-bucket-999999999999.json
 IMGCONTENT_GCS_BUCKET | 対象バケット名 | your-bucket
 
-画像ファイルのアップロード:
+## Usage
 
-```sh
-imgcontent upload $HOME/Pictures/awesome-image.png
+```
+NAME:
+   imagecontent - manage img content
+
+USAGE:
+   imgcontent [global options] command [command options] [arguments...]
+
+VERSION:
+   0.1.0
+
+AUTHOR:
+   Michto Maeda <https://github.com/micheam>
+
+COMMANDS:
+     upload   upload file as a web content
+     help, h  Shows a list of commands or help for one command
+
+GLOBAL OPTIONS:
+   --help, -h     show help
+   --version, -v  print the version
 ```
 
-アップロード済み画像の一覧表示:
+upload your jpeg to gcp:
 
-```sh
-imgcontent list --prefix 2019/07/01
+    imgcontent upload ./sample.jpeg
+
+result will print via stdout:
+
+```console
+$ imgcontent upload ./sample.jpeg
+![image.jpg](https://storage.googleapis.com/micheam-image-content/2019/11/17/070934.image.jpg)
 ```
 
-## Requirements
-
-TBD
 
 ## Installation
+clone this repository:
 
-TBD
+    git clone https://github.com/micheam/contentmgmt
+
+go to cmd directory:
+
+    cd ./contentmgmt/cmd/imgcontent && go install
+
+`imgcontent` binary will be installed:
+
+    imgcontent help
 
 ## Author
 [micheam](https://github.com/micheam) - <michito.maeda@gmail.com>
-
 
 [Google Cloud Storage]: https://cloud.google.com/storage/

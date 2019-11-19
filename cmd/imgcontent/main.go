@@ -25,7 +25,7 @@ func main() {
 	app.Usage = "manage img content"
 	app.Version = Version
 	app.Author = "Michto Maeda"
-	app.Email = "michito.maeda@gmail.com"
+	app.Email = "https://github.com/micheam"
 	app.Commands = []cli.Command{
 		uploadCmd,
 	}
@@ -39,7 +39,7 @@ func main() {
 
 var uploadCmd = cli.Command{
 	Name:      "upload",
-	Usage:     "画像ファイルをアップロードします",
+	Usage:     "upload file as a web content",
 	ArgsUsage: "<filepath>",
 	Action: func(c *cli.Context) error {
 
