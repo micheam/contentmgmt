@@ -83,6 +83,6 @@ $ imgcontent upload --format mkd ./sample.jpeg
 ```
 
 ## Author
-[micheam](https://github.com/micheam) - <michito.maeda@gmail.com>
+[micheam](https://github.com/micheam) - <https://github.com/micheam/>
 
 [Google Cloud Storage]: https://cloud.google.com/storage/
