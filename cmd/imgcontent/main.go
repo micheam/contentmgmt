@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"os"
 	"text/template"
@@ -26,6 +27,13 @@ func main() {
 	app.Version = Version
 	app.Author = "Michto Maeda"
 	app.Email = "https://github.com/micheam"
+	app.Flags = []cli.Flag{
+		cli.BoolFlag{
+			Name:   "verbose",
+			Usage:  "Print detail log",
+			Hidden: true,
+		},
+	}
 	app.Commands = []cli.Command{
 		uploadCmd,
 	}
@@ -49,6 +57,12 @@ var uploadCmd = cli.Command{
 		},
 	},
 	Action: func(c *cli.Context) error {
+
+		if c.GlobalBool("verbose") {
+			log.SetOutput(os.Stderr)
+		} else {
+			log.SetOutput(ioutil.Discard)
+		}
 
 		if c.NArg() > 1 {
 			return fmt.Errorf("too many args")
