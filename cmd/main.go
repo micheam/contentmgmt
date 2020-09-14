@@ -16,6 +16,7 @@ import (
 )
 
 const (
+	// Version ...
 	Version string = "0.1.0"
 )
 
@@ -78,13 +79,6 @@ var uploadCmd = cli.Command{
 		resultTemplate := `![{{.Alt}}]({{.Scheme}}://{{.Host}}/{{.Path}})`
 		uploadPresenter := ConsoleUploadResultPresenter{Tmpl: &resultTemplate}
 
-		// init interacter
-		usecase := imgcontent.UploadUsecase{
-			PathBuilder: contentPathBuilder,
-			Writer:      contentWriter,
-			Presenter:   uploadPresenter,
-		}
-
 		// create InputData
 		filename, err := imgcontent.NewFilename(file.Name())
 		if err != nil {
@@ -96,23 +90,28 @@ var uploadCmd = cli.Command{
 			Reader:   file,
 		}
 
-		return usecase.Handle(ctx, request)
+		return imgcontent.
+			NewUpload(contentPathBuilder, contentWriter, uploadPresenter).
+			Exec(ctx, request)
 	},
 }
 
+// ConsoleContentPathBuilder ...
 type ConsoleContentPathBuilder struct {
 	BaseTime *time.Time
 	Tmpl     *string
 }
 
+// DefaultContentPathTemplate ...
 const DefaultContentPathTemplate = `{{.BaseTime.Format "2006/01/02/030405"}}.{{.FileName}}`
 
+// Build ...
 func (c ConsoleContentPathBuilder) Build(
 	ctx context.Context, fname imgcontent.Filename) (path imgcontent.ContentPath, err error) {
 
 	basetime := time.Now()
 	if c.BaseTime != nil {
-		basetime = time.Now()
+		basetime = *c.BaseTime
 	}
 
 	model := struct {
@@ -142,12 +141,15 @@ func (c ConsoleContentPathBuilder) Build(
 	return
 }
 
+// ConsoleUploadResultPresenter ...
 type ConsoleUploadResultPresenter struct {
 	Tmpl *string
 }
 
+// DefaultResultTemplate ...
 const DefaultResultTemplate = `{{.Scheme}}://{{.Host}}/{{.Path}}`
 
+// Complete ...
 func (c ConsoleUploadResultPresenter) Complete(ctx context.Context, data imgcontent.UploadOutput) error {
 
 	model := struct {
