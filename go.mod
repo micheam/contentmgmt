@@ -7,4 +7,5 @@ require (
 	github.com/pkg/errors v0.8.1
 	github.com/stretchr/testify v1.6.1
 	github.com/urfave/cli v1.20.0
+	google.golang.org/api v0.7.0
 )

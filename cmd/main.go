@@ -6,9 +6,9 @@ import (
 	"log"
 	"os"
 
-	"cloud.google.com/go/storage"
 	"github.com/micheam/imgcontent"
 	"github.com/micheam/imgcontent/console"
+	"github.com/micheam/imgcontent/gcs"
 	"github.com/urfave/cli"
 )
 
@@ -44,8 +44,7 @@ var uploadCmd = cli.Command{
 			return fmt.Errorf("too many args")
 		}
 
-		filepath := c.Args().First()
-		f, err := os.Open(filepath)
+		f, err := os.Open(c.Args().First())
 		if err != nil {
 			return err
 		}
@@ -53,21 +52,14 @@ var uploadCmd = cli.Command{
 
 		ctx := context.Background()
 
-		// init contentPathBuilder
-		contentPathBuilder := imgcontent.TimeBaseContentPathBuilder{}
+		pathBuilder := imgcontent.TimeBaseContentPathBuilder{}
 
-		// init contentWriter
-		// TODO(michema): spec conf from file
-		os.Setenv("GOOGLE_APPLICATION_CREDENTIALS", os.Getenv("IMGCONTENT_GCS_CREDENTIALS"))
-		client, err := storage.NewClient(ctx)
+		client, err := gcs.NewClient(ctx)
 		if err != nil {
-			log.Fatalf("Failed to create client: %v", err)
+			log.Fatalf("Failed to create new Google Cloud Storage client: %v", err)
 		}
 
-		contentWriter := imgcontent.GCPContentRepository{
-			BucketName: os.Getenv("IMGCONTENT_GCS_BUCKET"),
-			Client:     client,
-		}
+		contentWriter := gcs.NewContentWriter(os.Getenv("IMGCONTENT_GCS_BUCKET"), client)
 
 		// create InputData
 		fname, err := imgcontent.NewFilename(f.Name())
@@ -76,7 +68,7 @@ var uploadCmd = cli.Command{
 		}
 
 		return imgcontent.
-			NewUpload(contentPathBuilder, contentWriter).
+			NewUpload(pathBuilder, contentWriter).
 			Exec(ctx, imgcontent.UploadInput{Filename: *fname, Reader: f}, console.UploadResultHandler())
 	},
 }
