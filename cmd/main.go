@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"text/template"
 
 	"cloud.google.com/go/storage"
 	"github.com/micheam/imgcontent"
-	"github.com/micheam/imgcontent/console"
 	"github.com/micheam/imgcontent/gcs"
 	"github.com/urfave/cli"
 )
@@ -64,17 +64,27 @@ var uploadCmd = cli.Command{
 		if fname, err = imgcontent.NewName(f.Name()); err != nil {
 			log.Fatal(err.Error())
 		}
+		handler := func(ctx context.Context, data imgcontent.UploadOutput) error {
+			model := struct {
+				Scheme, Host, Path, Alt string
+			}{
+				Scheme: data.URL.Scheme,
+				Host:   data.URL.Host,
+				Path:   data.URL.EscapedPath(),
+				Alt:    data.Name.Value,
+			}
+			// TODO(michema): spec template from file
+			resultTemplate := `![{{.Alt}}]({{.Scheme}}://{{.Host}}/{{.Path}})`
+			t := template.Must(template.New("result-template").Parse(resultTemplate))
+			t.Execute(os.Stdout, model)
+			return nil
+		}
 
-		return imgcontent.
-			NewUpload(
-				imgcontent.TimeBaseContentPathBuilder{},
-				gcs.NewContentWriter(gcs.BucketName(ctx), client),
-			).
-			Exec(
-				ctx,
-				imgcontent.UploadInput{Name: *fname, Reader: f},
-				console.UploadResultHandler(),
-			)
+		usecase := imgcontent.NewUpload(
+			imgcontent.TimeBaseContentPathBuilder{},
+			gcs.NewContentWriter(gcs.BucketName(ctx), client),
+		)
+		return usecase.Exec(ctx, imgcontent.UploadInput{Name: *fname, Reader: f}, handler)
 	},
 }
 
@@ -98,6 +108,12 @@ var listCmd = cli.Command{
 				Prefix: c.Args().First(),
 			}
 		)
-		return usecase.Exec(ctx, input, console.ListResultHandler())
+		handler := func(ctx context.Context, data imgcontent.ListOutput) error {
+			for c := range data.Contents {
+				fmt.Fprintln(os.Stdout, c.Path)
+			}
+			return nil
+		}
+		return usecase.Exec(ctx, input, handler)
 	},
 }
