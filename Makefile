@@ -1,7 +1,7 @@
 APPNAME=imgcontent
 
 $(APPNAME): clean
-	mkdir ./bin && go build -o ./bin/imgcontent
+	mkdir ./bin && go build -o ./bin/imgcontent cmd/imgcontent/main.go
 
 .PHONY: clean
 clean:

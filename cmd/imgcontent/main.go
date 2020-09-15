@@ -15,7 +15,7 @@ import (
 
 const (
 	// Version ...
-	Version string = "0.1.0"
+	Version string = "0.2.0"
 )
 
 func main() {
@@ -38,8 +38,8 @@ func main() {
 }
 
 var uploadCmd = cli.Command{
-	Name:      "upload",
-	Usage:     "画像ファイルをアップロードします",
+	Name:      "up",
+	Usage:     "upload new content",
 	ArgsUsage: "<filepath>",
 	Action: func(c *cli.Context) (err error) {
 		if c.NArg() > 1 {
@@ -89,7 +89,7 @@ var uploadCmd = cli.Command{
 }
 
 var listCmd = cli.Command{
-	Name:      "list",
+	Name:      "ls",
 	Usage:     "list existing image content",
 	ArgsUsage: "[prefix]",
 	Action: func(c *cli.Context) (err error) {
