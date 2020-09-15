@@ -1,21 +1,26 @@
 package imgcontent
 
 import (
+	"net/url"
 	"path/filepath"
 	"regexp"
 	"strings"
 )
 
-type ContentPath string
+// Path is a path of image content.
+type Path string
 
 var regxNewline = regexp.MustCompile(`\r\n|\r|\n`) //throw panic if fail
 
-type Filename struct {
+// Name is a name of image content.
+type Name struct {
 	Value string
 	Valid bool
 }
 
-func NewFilename(raw string) (fname *Filename, err error) {
+// NewName create new content-name.
+// this will return error if specified raw is invalid.
+func NewName(raw string) (fname *Name, err error) {
 
 	if raw == "" {
 		return fname, ErrIllegalFilename("file name must not be empty")
@@ -31,11 +36,12 @@ func NewFilename(raw string) (fname *Filename, err error) {
 	name = strings.ReplaceAll(name, " ", "_")
 	name = strings.ReplaceAll(name, "#", "_")
 
-	return &Filename{Value: name, Valid: true}, err
+	return &Name{Value: name, Valid: true}, err
 }
 
-type ErrIllegalFilename string
-
-func (e ErrIllegalFilename) Error() string {
-	return string(e)
+// ImageContent ...
+type ImageContent struct {
+	Name Name
+	Path Path
+	url.URL
 }

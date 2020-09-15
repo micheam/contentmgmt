@@ -12,25 +12,25 @@ func TestNewFilename(t *testing.T) {
 	tests := []struct {
 		name      string
 		args      args
-		wantFname *Filename
+		wantFname *Name
 		wantErr   bool
 	}{
 		{
 			name:      "filename will be trimmed",
 			args:      args{raw: " filename "},
-			wantFname: &Filename{Value: "filename", Valid: true},
+			wantFname: &Name{Value: "filename", Valid: true},
 			wantErr:   false,
 		},
 		{
 			name:      "white space will be replaced with '_'",
 			args:      args{raw: "file name"},
-			wantFname: &Filename{Value: "file_name", Valid: true},
+			wantFname: &Name{Value: "file_name", Valid: true},
 			wantErr:   false,
 		},
 		{
 			name:      "sharp will be replaced with '_'",
 			args:      args{raw: "file#name#"},
-			wantFname: &Filename{Value: "file_name_", Valid: true},
+			wantFname: &Name{Value: "file_name_", Valid: true},
 			wantErr:   false,
 		},
 		{
@@ -51,7 +51,7 @@ func TestNewFilename(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			gotFname, err := NewFilename(tt.args.raw)
+			gotFname, err := NewName(tt.args.raw)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("NewFilename() error = %v, wantErr %v", err, tt.wantErr)
 				return

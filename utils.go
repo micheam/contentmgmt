@@ -21,7 +21,7 @@ const DefaultContentPathTemplate = `{{.BaseTime.Format "2006/01/02/030405"}}.{{.
 
 // Build ...
 func (c TimeBaseContentPathBuilder) Build(
-	ctx context.Context, fname Filename) (path ContentPath, err error) {
+	ctx context.Context, fname Name) (path Path, err error) {
 
 	basetime := time.Now()
 	if c.BaseTime != nil {
@@ -47,6 +47,6 @@ func (c TimeBaseContentPathBuilder) Build(
 		return path, errors.Wrap(err, "failed to build content path")
 	}
 
-	path = ContentPath(buf.String())
+	path = Path(buf.String())
 	return
 }

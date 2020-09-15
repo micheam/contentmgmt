@@ -23,8 +23,21 @@ imgcontent upload $HOME/Pictures/awesome-image.png
 アップロード済み画像の一覧表示:
 
 ```sh
-imgcontent list --prefix 2019/07/01
+imgcontent list 2019/07/01
 ```
+
+## TODO
+
+- [x] upload image
+- [-] list image
+  - [x] filter with prefix
+  - [ ] options for output format(show url, updatedAt, etc)
+- [ ] get image
+  - [ ] get url
+  - [ ] get binary
+    - specify output file name/path.
+- [ ] remove image
+- [ ] S3 support 
 
 ## Requirements
 

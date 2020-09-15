@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 
+	"cloud.google.com/go/storage"
 	"github.com/micheam/imgcontent"
 	"github.com/micheam/imgcontent/console"
 	"github.com/micheam/imgcontent/gcs"
@@ -26,6 +27,7 @@ func main() {
 	app.Email = "michito.maeda@gmail.com"
 	app.Commands = []cli.Command{
 		uploadCmd,
+		listCmd,
 	}
 
 	err := app.Run(os.Args)
@@ -39,36 +41,63 @@ var uploadCmd = cli.Command{
 	Name:      "upload",
 	Usage:     "画像ファイルをアップロードします",
 	ArgsUsage: "<filepath>",
-	Action: func(c *cli.Context) error {
+	Action: func(c *cli.Context) (err error) {
 		if c.NArg() > 1 {
 			return fmt.Errorf("too many args")
 		}
 
-		f, err := os.Open(c.Args().First())
-		if err != nil {
+		var f *os.File
+		if f, err = os.Open(c.Args().First()); err != nil {
 			return err
 		}
 		defer f.Close()
 
-		ctx := context.Background()
-
-		pathBuilder := imgcontent.TimeBaseContentPathBuilder{}
-
-		client, err := gcs.NewClient(ctx)
-		if err != nil {
+		var (
+			ctx    = context.Background()
+			client *storage.Client
+		)
+		if client, err = gcs.NewClient(ctx); err != nil {
 			log.Fatalf("Failed to create new Google Cloud Storage client: %v", err)
 		}
 
-		contentWriter := gcs.NewContentWriter(os.Getenv("IMGCONTENT_GCS_BUCKET"), client)
-
-		// create InputData
-		fname, err := imgcontent.NewFilename(f.Name())
-		if err != nil {
+		var fname *imgcontent.Name
+		if fname, err = imgcontent.NewName(f.Name()); err != nil {
 			log.Fatal(err.Error())
 		}
 
 		return imgcontent.
-			NewUpload(pathBuilder, contentWriter).
-			Exec(ctx, imgcontent.UploadInput{Filename: *fname, Reader: f}, console.UploadResultHandler())
+			NewUpload(
+				imgcontent.TimeBaseContentPathBuilder{},
+				gcs.NewContentWriter(gcs.BucketName(ctx), client),
+			).
+			Exec(
+				ctx,
+				imgcontent.UploadInput{Name: *fname, Reader: f},
+				console.UploadResultHandler(),
+			)
+	},
+}
+
+var listCmd = cli.Command{
+	Name:      "list",
+	Usage:     "list existing image content",
+	ArgsUsage: "[prefix]",
+	Action: func(c *cli.Context) (err error) {
+		var (
+			ctx    = context.Background()
+			client *storage.Client
+		)
+		if client, err = gcs.NewClient(ctx); err != nil {
+			log.Fatalf("Failed to create new Google Cloud Storage client: %v", err)
+		}
+
+		var (
+			reader  = gcs.NewContentReader(gcs.BucketName(ctx), client)
+			usecase = imgcontent.NewList(reader)
+			input   = imgcontent.ListInput{
+				Prefix: c.Args().First(),
+			}
+		)
+		return usecase.Exec(ctx, input, console.ListResultHandler())
 	},
 }

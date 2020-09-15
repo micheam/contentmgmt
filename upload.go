@@ -17,12 +17,12 @@ type (
 	UploadResultHandler func(ctx context.Context, data UploadOutput) error
 	// UploadInput ...
 	UploadInput struct {
-		Filename
+		Name
 		Reader io.Reader
 	}
 	// UploadOutput ...
 	UploadOutput struct {
-		Filename
+		Name
 		url.URL
 	}
 )
@@ -40,10 +40,10 @@ func NewUpload(PathBuilder ContentPathBuilder, Writer ContentWriter) Upload {
 func (u upload) Exec(ctx context.Context, input UploadInput, cb UploadResultHandler) error {
 	var (
 		err  error
-		path ContentPath
+		path Path
 		url  url.URL
 	)
-	if path, err = u.PathBuilder.Build(ctx, input.Filename); err != nil {
+	if path, err = u.PathBuilder.Build(ctx, input.Name); err != nil {
 		return errors.Cause(err)
 	}
 
@@ -52,7 +52,7 @@ func (u upload) Exec(ctx context.Context, input UploadInput, cb UploadResultHand
 	}
 
 	return cb(ctx, UploadOutput{
-		Filename: input.Filename,
-		URL:      url,
+		Name: input.Name,
+		URL:  url,
 	})
 }
